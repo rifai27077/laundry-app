@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 type Paket = {
   id: number;
@@ -8,6 +8,7 @@ type Paket = {
   jenis: string;
   nama_paket: string;
   harga: number;
+  berat_kg?: number;
 };
 
 // ======================= MODAL =======================
@@ -57,11 +58,8 @@ function ModalPaket({
           }}
           className="space-y-5"
         >
-          {/* ID OUTLET */}
           <div>
-            <label htmlFor="id_outlet" className="text-gray-300 text-sm">
-              ID Outlet
-            </label>
+            <label htmlFor="id_outlet" className="text-gray-300 text-sm">ID Outlet</label>
             <input
               id="id_outlet"
               type="number"
@@ -73,13 +71,10 @@ function ModalPaket({
             />
           </div>
 
-          {/* JENIS */}
           <div>
-            <label htmlFor="jenis" className="text-gray-300 text-sm">
-              Jenis Paket
-            </label>
+            <label htmlFor="jenis_paket" className="text-gray-300 text-sm">Jenis Paket</label>
             <select
-              id="jenis"
+              id="jenis_paket"
               name="jenis"
               value={form.jenis}
               onChange={handleChange}
@@ -91,15 +86,12 @@ function ModalPaket({
               <option value="selimut">Selimut</option>
               <option value="bed_cover">Bed Cover</option>
               <option value="kaos">Kaos</option>
-              <option value="lain">Lain</option>
+              <option value="lain">Lain-lain</option>
             </select>
           </div>
 
-          {/* NAMA PAKET */}
           <div>
-            <label htmlFor="nama_paket" className="text-gray-300 text-sm">
-              Nama Paket
-            </label>
+            <label htmlFor="nama_paket" className="text-gray-300 text-sm">Nama Paket</label>
             <input
               id="nama_paket"
               name="nama_paket"
@@ -110,24 +102,43 @@ function ModalPaket({
             />
           </div>
 
-          {/* HARGA */}
-          <div>
-            <label htmlFor="harga" className="text-gray-300 text-sm">
-              Harga (Rp)
-            </label>
-            <input
-              id="harga"
-              type="number"
-              name="harga"
-              value={form.harga}
-              onChange={handleChange}
-              required
-              className="w-full p-3 mt-1 rounded-xl bg-[#152036] text-white border border-gray-600"
-            />
-          </div>
+          {form.jenis === "kiloan" ? (
+            <div>
+              <label htmlFor="berat_kg" className="text-gray-300 text-sm">Berat (kg)</label>
+              <input
+                id="berat_kg"
+                type="number"
+                name="berat_kg"
+                value={form.berat_kg ?? 0}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    berat_kg: Number(e.target.value),
+                    harga: Number(e.target.value) * 7000, // Otomatis hitung harga
+                  })
+                }
+                required
+                className="w-full p-3 mt-1 rounded-xl bg-[#152036] text-white border border-gray-600"
+              />
+            </div>
+          ) : (
+            <div>
+              <label htmlFor="harga" className="text-gray-300 text-sm">Harga</label>
+              <input
+                id="harga"
+                type="number"
+                name="harga"
+                value={form.harga ?? 0}
+                onChange={(e) =>
+                  setForm({ ...form, harga: Number(e.target.value) })
+                }
+                required
+                className="w-full p-3 mt-1 rounded-xl bg-[#152036] text-white border border-gray-600"
+              />
+            </div>
+          )}
 
-          {/* BUTTON */}
-          <div className="flex gap-3 mt-6">
+          <div className="flex gap-3">
             <button
               type="button"
               onClick={onClose}
@@ -149,54 +160,71 @@ function ModalPaket({
   );
 }
 
-// ======================= MAIN PAGE =======================
+// ======================= PAGE =======================
 export default function PaketPage() {
   const [open, setOpen] = useState(false);
   const [editId, setEditId] = useState<number | null>(null);
+  const [pakets, setPakets] = useState<Paket[]>([]);
 
-  // SSR-safe formatter
   const formatRupiah = new Intl.NumberFormat("id-ID").format;
 
-  const [pakets, setPakets] = useState<Paket[]>([
-    {
-      id: 1,
-      id_outlet: 1,
-      jenis: "kiloan",
-      nama_paket: "Cuci Kering",
-      harga: 7000,
-    },
-    {
-      id: 2,
-      id_outlet: 1,
-      jenis: "bed_cover",
-      nama_paket: "Cuci Bed Cover Besar",
-      harga: 25000,
-    },
-  ]);
+  const loadPaket = async () => {
+    const res = await fetch("/api/paket");
+    const data = await res.json();
+    setPakets(data);
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      await loadPaket();
+    };
+    fetchData();
+  }, []);
+
 
   const [form, setForm] = useState<Omit<Paket, "id">>({
     id_outlet: 1,
     jenis: "",
     nama_paket: "",
     harga: 0,
+    berat_kg: 0,
   });
 
-  const openCreate = () => {
-    setEditId(null);
-    setForm({ id_outlet: 1, jenis: "", nama_paket: "", harga: 0 });
-    setOpen(true);
-  };
+  // ================== SUBMIT ==================
+  const handleSubmit = async () => {
+    const payload = {
+      ...form,
+      harga: form.jenis === "kiloan"
+        ? Number(form.berat_kg) * 7000
+        : form.harga,
+    };
 
-  const handleSubmit = () => {
     if (editId) {
-      setPakets((prev) =>
-        prev.map((p) => (p.id === editId ? { ...p, ...form } : p))
-      );
+      await fetch("/api/paket", {
+        method: "PUT",
+        body: JSON.stringify({ id: editId, ...payload }),
+      });
     } else {
-      setPakets((prev) => [...prev, { id: Date.now(), ...form }]);
+      await fetch("/api/paket", {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
     }
 
     setOpen(false);
+    loadPaket();
+  };
+
+  const openCreate = () => {
+    setEditId(null);
+    setForm({
+      id_outlet: 1,
+      jenis: "",
+      nama_paket: "",
+      harga: 0,
+      berat_kg: 0, // ← WAJIB agar tidak undefined
+    });
+    setOpen(true);
   };
 
   const handleEdit = (p: Paket) => {
@@ -206,16 +234,21 @@ export default function PaketPage() {
       jenis: p.jenis,
       nama_paket: p.nama_paket,
       harga: p.harga,
+      berat_kg: p.berat_kg ?? 0,
     });
     setOpen(true);
   };
 
-  const handleDelete = (id: number) =>
-    setPakets((prev) => prev.filter((p) => p.id !== id));
+  const handleDelete = async (id: number) => {
+    await fetch("/api/paket", {
+      method: "DELETE",
+      body: JSON.stringify({ id }),
+    });
+    loadPaket();
+  };
 
   return (
     <div className="space-y-10 p-4 md:p-6">
-      {/* Header */}
       <div className="flex justify-between mb-6">
         <h1 className="text-2xl font-bold text-white">Data Paket Laundry</h1>
 
@@ -227,7 +260,6 @@ export default function PaketPage() {
         </button>
       </div>
 
-      {/* Modal */}
       <ModalPaket
         open={open}
         onClose={() => setOpen(false)}
@@ -237,14 +269,13 @@ export default function PaketPage() {
         editId={editId}
       />
 
-      {/* Table */}
       <div className="bg-[#0D1526] p-6 rounded-2xl border border-gray-700 shadow-xl">
         <h2 className="text-xl font-bold text-white mb-4">Daftar Paket</h2>
 
         <table className="w-full text-left text-gray-300">
           <thead>
             <tr className="border-b border-gray-700">
-              <th>ID Outlet</th>
+              <th className="py-2">Outlet</th>
               <th>Jenis</th>
               <th>Nama Paket</th>
               <th>Harga</th>

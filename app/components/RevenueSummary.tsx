@@ -2,12 +2,20 @@
 
 import { DollarSign } from "lucide-react";
 
-export default function RevenueSummary({ daily, monthly, yearly }: any) {
+export default function RevenueSummary({
+  daily,
+  monthly,
+  yearly,
+}: {
+  daily?: { total: number; day?: string }[];
+  monthly?: { total: number }[];
+  yearly?: { total: number }[];
+}) {
   const totalBulanan =
-    monthly?.reduce((acc: number, cur: any) => acc + (cur.total ?? 0), 0) ?? 0;
+    monthly?.reduce((acc, cur) => acc + (cur.total ?? 0), 0) ?? 0;
 
   const totalTahunan =
-    yearly?.reduce((acc: number, cur: any) => acc + (cur.total ?? 0), 0) ?? 0;
+    yearly?.reduce((acc, cur) => acc + (cur.total ?? 0), 0) ?? 0;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-10 gap-6">

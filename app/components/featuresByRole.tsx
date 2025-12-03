@@ -9,8 +9,9 @@ import {
   Receipt,
   ListChecks,
 } from "lucide-react";
+import { MenuItem } from "@/types/menu";
 
-export const featuresByRole = {
+export const featuresByRole: Record<"admin" | "kasir" | "owner", MenuItem[]> = {
   admin: [
     {
       title: "Dashboard",

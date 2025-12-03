@@ -6,7 +6,7 @@ type Outlet = {
     id: number;
     nama: string;
     alamat: string;
-    tip: string;
+    tlp: string;
 };
 
 export default function ModalAddOutlet({
@@ -83,23 +83,19 @@ export default function ModalAddOutlet({
                     </div>
 
                     <div>
-                        <label htmlFor="tipeOutlet" className="text-gray-300 text-sm">
-                            Tipe Outlet
+                        <label htmlFor="tlpOutlet" className="text-gray-300 text-sm">
+                            Telepon Outlet
                         </label>
 
-                        <select
-                            id="tipeOutlet"
-                            name="tip"
-                            value={form.tip}
+                        <input
+                            id="tlpOutlet"
+                            name="tlp"
+                            value={form.tlp}
                             onChange={handleChange}
                             required
+                            placeholder="Contoh: 08123456789"
                             className="w-full p-3 mt-1 rounded-xl bg-[#152036] text-white border border-gray-600"
-                        >
-                            <option value="">-- Pilih Tipe --</option>
-                            <option value="utama">Utama</option>
-                            <option value="cabang">Cabang</option>
-                            <option value="mitra">Mitra</option>
-                        </select>
+                        />
                     </div>
 
                     <div className="flex gap-3 mt-6">
@@ -107,14 +103,14 @@ export default function ModalAddOutlet({
                             type="button"
                             onClick={onClose}
                             className="w-1/2 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-xl"
-                            >
+                        >
                             Batal
                         </button>
 
                         <button
                             type="submit"
                             className="w-1/2 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl"
-                            >
+                        >
                             Simpan
                         </button>
                     </div>

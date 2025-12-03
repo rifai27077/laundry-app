@@ -6,13 +6,15 @@ import { useSession, signOut } from "next-auth/react";
 import { featuresByRole } from "./featuresByRole";
 import { LogOut, UserCircle2, Menu } from "lucide-react";
 import { useState } from "react";
+import { UserRole } from "@/types/role";
+import { MenuItem } from "@/types/menu";
 
 export default function Sidebar() {
   const pathname = usePathname();
   const { data: session } = useSession();
 
-  const role = session?.user?.role ?? "admin";
-  const menu = featuresByRole[role];
+  const role: UserRole = session?.user?.role ?? "admin";
+  const menu: MenuItem[] = featuresByRole[role];
 
   const [open, setOpen] = useState(false);
 
@@ -20,6 +22,7 @@ export default function Sidebar() {
     <>
       {/* Mobile Toggle Button */}
       <button
+        aria-label="Open sidebar"
         className="md:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-white dark:bg-gray-800 shadow-lg"
         onClick={() => setOpen(true)}
       >
@@ -58,7 +61,7 @@ export default function Sidebar() {
 
         {/* Navigation */}
         <nav className="space-y-2 flex-1">
-          {menu.map((item: any, index: number) => {
+          {menu.map((item, index) => {
             const Icon = item.icon;
             const active = pathname === item.path;
 

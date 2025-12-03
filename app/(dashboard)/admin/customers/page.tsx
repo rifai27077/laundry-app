@@ -23,9 +23,9 @@ export default function MemberPage() {
   const [members, setMembers] = useState<Member[]>([]);
 
   const loadMembers = async () => {
-    const res = await fetch("/api/member/list");
-    const data: Member[] = await res.json();
-    setMembers(data);
+    const res = await fetch("/api/member");
+      const data: Member[] = await res.json();
+      setMembers(data);
   };
 
   const handleSubmit = async (form: FormMember) => {

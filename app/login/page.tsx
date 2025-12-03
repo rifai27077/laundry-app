@@ -13,7 +13,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleLogin = async (e: any) => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setErrorMsg("");
@@ -30,9 +30,13 @@ export default function LoginPage() {
       return;
     }
 
-    if (username === "admin") router.push("/admin/dashboard");
-    if (username === "kasir") router.push("/dashboard/kasir");
-    if (username === "owner") router.push("/dashboard/owner");
+    if (res?.ok) {
+      const role = (await fetch("/api/auth/session").then(r => r.json())).user.role;
+
+      if (role === "admin") router.push("/admin/dashboard");
+      if (role === "kasir") router.push("/dashboard/kasir");
+      if (role === "owner") router.push("/dashboard/owner");
+}
   };
 
   return (
