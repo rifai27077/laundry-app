@@ -6,8 +6,6 @@ import {
   UserCog,
   FilePlus,
   BarChart3,
-  Receipt,
-  ListChecks,
 } from "lucide-react";
 import { MenuItem } from "@/types/menu";
 
@@ -72,13 +70,13 @@ export const featuresByRole: Record<"admin" | "kasir" | "owner", MenuItem[]> = {
     },
     {
       title: "Entri Transaksi",
-      icon: Receipt,
+      icon: FilePlus,
       color: "text-orange-600",
       path: "/kasir/transactions",
     },
     {
       title: "Generate Laporan",
-      icon: ListChecks,
+      icon: BarChart3,
       color: "text-green-600",
       path: "/kasir/reports",
     },
@@ -99,7 +97,7 @@ export const featuresByRole: Record<"admin" | "kasir" | "owner", MenuItem[]> = {
     },
     {
       title: "Data Transaksi",
-      icon: Receipt,
+      icon: FilePlus,
       color: "text-purple-600",
       path: "/owner/transactions",
     },

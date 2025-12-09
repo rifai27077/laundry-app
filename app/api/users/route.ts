@@ -28,7 +28,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ message: "User ditambahkan" });
   } catch (error) {
-    console.log("POST Users Error:", error);
+    console.error("POST Users Error:", error);
     return NextResponse.json({ error: "Gagal menambah user" }, { status: 500 });
   }
 }

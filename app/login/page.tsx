@@ -34,8 +34,8 @@ export default function LoginPage() {
       const role = (await fetch("/api/auth/session").then(r => r.json())).user.role;
 
       if (role === "admin") router.push("/admin/dashboard");
-      if (role === "kasir") router.push("/dashboard/kasir");
-      if (role === "owner") router.push("/dashboard/owner");
+      if (role === "kasir") router.push("/kasir/dashboard");
+      if (role === "owner") router.push("/owner/dashboard");
 }
   };
 

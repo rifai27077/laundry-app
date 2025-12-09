@@ -13,8 +13,8 @@ export async function middleware(req: NextRequest) {
     if (!token) {
         if (
             pathname.startsWith("/admin") ||
-            pathname.startsWith("/dashboard/kasir") ||
-            pathname.startsWith("/dashboard/owner")
+            pathname.startsWith("/kasir") ||
+            pathname.startsWith("/owner")
         ) {
             return NextResponse.redirect(new URL("/login", req.url));
         }
@@ -30,12 +30,12 @@ export async function middleware(req: NextRequest) {
     }
 
     // ====== Proteksi Kasir ======
-    if (pathname.startsWith("/dashboard/kasir") && role !== "kasir") {
+    if (pathname.startsWith("/kasir") && role !== "kasir") {
         return NextResponse.redirect(new URL("/unauthorized", req.url));
     }
 
     // ====== Proteksi Owner ======
-    if (pathname.startsWith("/dashboard/owner") && role !== "owner") {
+    if (pathname.startsWith("/owner") && role !== "owner") {
         return NextResponse.redirect(new URL("/unauthorized", req.url));
     }
 
@@ -45,7 +45,7 @@ export async function middleware(req: NextRequest) {
 export const config = {
     matcher: [
         "/admin/:path*",
-        "/dashboard/kasir/:path*",
-        "/dashboard/owner/:path*",
+        "/kasir/:path*",
+        "/owner/:path*",
     ],
 };
