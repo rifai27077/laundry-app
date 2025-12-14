@@ -5,9 +5,17 @@ import { sql } from "@/lib/db";
 export async function GET() {
   try {
     const users = await sql`
-      SELECT id, nama, username, id_outlet, role
-      FROM users
-      ORDER BY id DESC
+      SELECT 
+        u.id,
+        u.nama,
+        u.username,
+        u.password,
+        u.role,
+        u.id_outlet,
+        o.alamat AS outlet_alamat
+      FROM users u
+      LEFT JOIN outlet o ON u.id_outlet = o.id
+      ORDER BY u.id DESC
     `;
     return NextResponse.json(users);
   } catch (error) {

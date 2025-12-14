@@ -8,14 +8,22 @@ type User = {
   nama: string;
   username: string;
   password: string;
-  id_outlet: number;
+  id_outlet: number | null;
+  outlet_alamat?: string;
   role: "admin" | "kasir" | "owner";
+};
+
+type Outlet = {
+  id: number;
+  alamat: string;
 };
 
 export default function UserPage() {
   const [users, setUsers] = useState<User[]>([]);
+  const [outlets, setOutlets] = useState<Outlet[]>([]);
   const [open, setOpen] = useState(false);
   const [editId, setEditId] = useState<number | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const [form, setForm] = useState<Omit<User, "id">>({
     nama: "",
@@ -27,9 +35,21 @@ export default function UserPage() {
 
   const loadUsers = async () => {
     const res = await fetch("/api/users");
+    
     const data = await res.json();
     setUsers(data);
   };
+
+  const loadOutlets = async () => {
+    const res = await fetch("/api/outlet");
+    const data = await res.json();
+    setOutlets(data);
+  };
+
+  useEffect(() => {
+    loadUsers();
+    loadOutlets();
+  }, []);
 
   // FIX useEffect async warning
   useEffect(() => {
@@ -40,20 +60,28 @@ export default function UserPage() {
   }, []);
 
   const handleSubmit = async () => {
-    if (editId) {
-      await fetch("/api/users", {
-        method: "PUT",
-        body: JSON.stringify({ id: editId, ...form }),
-      });
-    } else {
-      await fetch("/api/users", {
-        method: "POST",
-        body: JSON.stringify(form),
-      });
+    setLoading(true); // mulai loading
+    try {
+      if (editId) {
+        await fetch("/api/users", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: editId, ...form }),
+        });
+      } else {
+        await fetch("/api/users", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(form),
+        });
+      }
+      setOpen(false);
+      loadUsers();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false); // selesai loading
     }
-
-    setOpen(false);
-    loadUsers();
   };
 
   const handleDelete = async (id: number) => {
@@ -108,7 +136,7 @@ export default function UserPage() {
               <th className="py-2">Nama</th>
               <th>Username</th>
               <th>Role</th>
-              <th>ID Outlet</th>
+              <th>Alamat Outlet</th>
               <th className="text-center">Aksi</th>
             </tr>
           </thead>
@@ -127,7 +155,7 @@ export default function UserPage() {
                 <td className="py-2">{u.nama}</td>
                 <td>{u.username}</td>
                 <td className="capitalize">{u.role}</td>
-                <td>{u.id_outlet}</td>
+                <td>{u.outlet_alamat ?? "-"}</td>
 
                 <td className="text-center space-x-3">
                   <button
@@ -205,16 +233,22 @@ export default function UserPage() {
 
               {/* ID Outlet */}
               <div>
-                <label htmlFor="id_outlet" className="text-gray-300 text-sm">ID Outlet</label>
-                <input
+                <label htmlFor="id_outlet" className="text-gray-300 text-sm">Alamat Outlet</label>
+                <select
                   id="id_outlet"
-                  type="number"
-                  value={form.id_outlet}
+                  value={form.id_outlet ?? ""}
                   onChange={(e) =>
                     setForm({ ...form, id_outlet: Number(e.target.value) })
                   }
                   className="w-full p-3 mt-1 rounded-xl bg-[#152036] text-white border border-gray-600"
-                />
+                >
+                  <option value="">Pilih alamat outlet</option>
+                  {outlets.map((o) => (
+                    <option key={o.id} value={o.id}>
+                      {o.alamat}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               {/* Role */}
@@ -245,9 +279,14 @@ export default function UserPage() {
 
                 <button
                   onClick={handleSubmit}
-                  className="w-1/2 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl"
+                  disabled={loading} // disable saat request
+                  className={`w-1/2 py-3 text-white rounded-xl ${
+                    loading
+                      ? "bg-blue-400 cursor-not-allowed"
+                      : "bg-blue-600 hover:bg-blue-700"
+                  }`}
                 >
-                  Simpan
+                  {loading ? "Menyimpan..." : "Simpan"}
                 </button>
               </div>
             </div>

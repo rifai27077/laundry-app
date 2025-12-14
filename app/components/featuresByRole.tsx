@@ -30,19 +30,13 @@ export const featuresByRole: Record<"admin" | "kasir" | "owner", MenuItem[]> = {
       path: "/admin/outlets",
     },
     {
-      title: "Paket Cucian",
-      icon: PackageSearch,
-      color: "text-yellow-600",
-      path: "/admin/packages",
-    },
-    {
       title: "Pengguna",
       icon: UserCog,
       color: "text-purple-600",
       path: "/admin/users",
     },
     {
-      title: "Entri Transaksi",
+      title: "Transaksi",
       icon: FilePlus,
       color: "text-orange-600",
       path: "/admin/transactions",
@@ -69,7 +63,19 @@ export const featuresByRole: Record<"admin" | "kasir" | "owner", MenuItem[]> = {
       path: "/kasir/customers",
     },
     {
-      title: "Entri Transaksi",
+      title: "Outlet",
+      icon: Store,
+      color: "text-green-600",
+      path: "/kasir/outlets",
+    },
+    {
+      title: "Paket Cucian",
+      icon: PackageSearch,
+      color: "text-yellow-600",
+      path: "/kasir/packages",
+    },
+    {
+      title: "Transaksi",
       icon: FilePlus,
       color: "text-orange-600",
       path: "/kasir/transactions",
