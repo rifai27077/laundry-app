@@ -98,14 +98,8 @@ export const featuresByRole: Record<"admin" | "kasir" | "owner", MenuItem[]> = {
     {
       title: "Lihat Laporan",
       icon: BarChart3,
-      color: "text-blue-600",
+      color: "text-red-600",
       path: "/owner/reports",
-    },
-    {
-      title: "Data Transaksi",
-      icon: FilePlus,
-      color: "text-purple-600",
-      path: "/owner/transactions",
     },
   ],
 };
