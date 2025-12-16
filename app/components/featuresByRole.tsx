@@ -30,6 +30,12 @@ export const featuresByRole: Record<"admin" | "kasir" | "owner", MenuItem[]> = {
       path: "/admin/outlets",
     },
     {
+      title: "Paket Cucian",
+      icon: PackageSearch,
+      color: "text-yellow-600",
+      path: "/admin/packages",
+    },
+    {
       title: "Pengguna",
       icon: UserCog,
       color: "text-purple-600",

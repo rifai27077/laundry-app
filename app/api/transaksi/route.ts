@@ -114,12 +114,37 @@ export async function DELETE(req: Request) {
   try {
     const { id } = await req.json();
 
-    await sql`DELETE FROM transaksi WHERE id = ${id}`;
-    await sql`DELETE FROM detail_transaksi WHERE id_transaksi = ${id}`;
+    // 1️⃣ hapus detail terlebih dahulu
+    await sql`
+      DELETE FROM detail_transaksi
+      WHERE id_transaksi = ${id}
+    `;
+
+    // 2️⃣ baru hapus transaksi
+    await sql`
+      DELETE FROM transaksi
+      WHERE id = ${id}
+    `;
 
     return NextResponse.json({ success: true });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("DELETE transaksi error:", error);
-    return NextResponse.json({ error: "Gagal menghapus transaksi" }, { status: 500 });
+
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      (error as { code: string }).code === "23503"
+    ) {
+      return NextResponse.json(
+        { error: "Transaksi tidak bisa dihapus karena masih memiliki detail." },
+        { status: 400 }
+      );
+    }
+
+    return NextResponse.json(
+      { error: "Gagal menghapus transaksi" },
+      { status: 500 }
+    );
   }
 }

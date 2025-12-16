@@ -69,8 +69,26 @@ export async function DELETE(req: Request) {
         `;
 
         return NextResponse.json({ message: "Outlet berhasil dihapus" });
-    } catch (error) {
+    } catch (error: unknown) {
         console.error("DELETE Outlet Error:", error);
-        return NextResponse.json({ error: "Gagal menghapus outlet" }, { status: 500 });
+
+        if (
+            typeof error === "object" &&
+            error !== null &&
+            "code" in error &&
+            (error as { code: string }).code === "23503"
+        ) {
+            return NextResponse.json(
+                {
+                    error: "Outlet tidak bisa dihapus karena masih memiliki paket.",
+                },
+                { status: 400 }
+            );
+        }
+
+        return NextResponse.json(
+            { error: "Gagal menghapus outlet" },
+            { status: 500 }
+        );
     }
 }

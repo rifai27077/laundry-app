@@ -83,11 +83,18 @@ export default function OutletPage() {
     // DELETE
     // ============================
     const handleDelete = async (id: number) => {
-        await fetch("/api/outlet", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id }),
+        const res = await fetch("/api/outlet", {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id }),
         });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            alert(data.error || "Gagal menghapus outlet");
+            return;
+        }
 
         loadOutlets();
     };

@@ -34,6 +34,13 @@ type DetailForm = {
   harga: number;
 };
 
+function formatDateOnly(value?: string | null) {
+  if (!value) return "";
+  // handle: "2025-12-16 00:00:00" & ISO
+  return value.split(" ")[0].split("T")[0];
+}
+
+
 /* ============================
    PAGE UTAMA
 ===============================*/
@@ -103,8 +110,8 @@ export default function TransaksiPage() {
       // format tgl if necessary (take date part)
       const normalized = data.map((t: Transaksi) => ({
         ...t,
-        tgl: t.tgl ? t.tgl.split?.("T")?.[0] ?? String(t.tgl) : "",
-        batas_waktu: t.batas_waktu ? t.batas_waktu.split?.("T")?.[0] ?? String(t.batas_waktu) : "",
+        tgl: formatDateOnly(t.tgl),
+        batas_waktu: formatDateOnly(t.batas_waktu),
       }));
       setTransaksi(normalized);
     } catch (err) {
@@ -160,8 +167,8 @@ export default function TransaksiPage() {
       id_outlet: t.id_outlet,
       kode_invoice: t.kode_invoice,
       id_member: t.id_member,
-      tgl: t.tgl.split?.("T")?.[0] ?? t.tgl,
-      batas_waktu: t.batas_waktu.split?.("T")?.[0] ?? t.batas_waktu,
+      tgl: formatDateOnly(t.tgl),
+      batas_waktu: formatDateOnly(t.batas_waktu),
       tgl_bayar: t.tgl_bayar ?? "",
       biaya_tambahan: t.biaya_tambahan,
       diskon: t.diskon,
@@ -347,7 +354,7 @@ export default function TransaksiPage() {
               >
                 <td className="py-2">{t.kode_invoice}</td>
                 <td>{t.id_member}</td>
-                <td>{t.tgl}</td>
+                <td>{formatDateOnly(t.tgl)}</td>
                 <td>{t.status}</td>
                 <td>Rp {t.grand_total ?? 0}</td>
 
