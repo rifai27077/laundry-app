@@ -1,3 +1,18 @@
+## Dashboard Administrator
+![Landing Page](public/img/dashboard-admin1.png)
+![Landing Page](public/img/dashboard-admin2.png)
+![Landing Page](public/img/dashboard-admin3.png)
+![Landing Page](public/img/dashboard-admin4.png)
+![Landing Page](public/img/dashboard-admin5.png)
+![Landing Page](public/img/dashboard-admin6.png)
+![Landing Page](public/img/dashboard-admin7.png)
+
+## Dashboard Administrator
+![Landing Page](public/img/dashboard-kasir.png)
+
+## Dashboard Administrator
+![Landing Page](public/img/dashboard-owner.png)
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
