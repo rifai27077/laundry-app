@@ -7,10 +7,10 @@
 ![Landing Page](public/img/dashboard-admin6.png)
 ![Landing Page](public/img/dashboard-admin7.png)
 
-## Dashboard Administrator
+## Dashboard Kasie
 ![Landing Page](public/img/dashboard-kasir.png)
 
-## Dashboard Administrator
+## Dashboard Owner
 ![Landing Page](public/img/dashboard-owner.png)
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
