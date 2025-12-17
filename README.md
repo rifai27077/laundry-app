@@ -7,7 +7,7 @@
 ![Landing Page](public/img/dashboard-admin6.png)
 ![Landing Page](public/img/dashboard-admin7.png)
 
-## Dashboard Kasie
+## Dashboard Kasir
 ![Landing Page](public/img/dashboard-kasir.png)
 
 ## Dashboard Owner
