@@ -1,51 +1,99 @@
-## Dashboard Administrator
-![Landing Page](public/img/dashboard-admin1.png)
-![Landing Page](public/img/dashboard-admin2.png)
-![Landing Page](public/img/dashboard-admin3.png)
-![Landing Page](public/img/dashboard-admin4.png)
-![Landing Page](public/img/dashboard-admin5.png)
-![Landing Page](public/img/dashboard-admin6.png)
-![Landing Page](public/img/dashboard-admin7.png)
+# Laundry App
 
-## Dashboard Kasir
-![Landing Page](public/img/dashboard-kasir.png)
+A comprehensive web-based laundry management system designed to streamline operations for laundry businesses. This application provides dedicated dashboards for Administrators, Cashiers, and Owners to manage transactions, customers, and business performance efficiently.
 
-## Dashboard Owner
-![Landing Page](public/img/dashboard-owner.png)
+🔗 **[Live Demo](https://laundry-app-gold.vercel.app)**
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Login as Admin
+- **Username:** admin
+- **Password:** admin123
 
-## Getting Started
+Login as Cashier
+- **Username:** kasir
+- **Password:** kasir123
 
-First, run the development server:
+Login as Owner
+- **Username:** owner
+- **Password:** owner123
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🚀 Tech Stack
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Built with modern web technologies for performance and scalability:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Framework:** [Next.js 16](https://nextjs.org/)
+- **Language:** [TypeScript](https://www.typescriptlang.org/)
+- **Styling:** [Tailwind CSS](https://tailwindcss.com/)
+- **Database:** [Neon (PostgreSQL)](https://neon.tech/)
+- **ORM:** [Drizzle ORM](https://orm.drizzle.team/)
+- **Authentication:** [NextAuth.js](https://next-auth.js.org/)
+- **Icons:** [Lucide React](https://lucide.dev/)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## ✨ key Features
 
-## Learn More
+### 1. Dashboard Administrator
+Manage the core aspects of the laundry business including master data and user roles.
+- **User Management**: Manage admins, cashiers, and owners.
+- **Master Data**: Manage products/services and categories.
+- **Reporting**: View overall business stats.
 
-To learn more about Next.js, take a look at the following resources:
+![Admin Dashboard](public/img/dashboard-admin1.png)
+![Admin Dashboard](public/img/dashboard-admin2.png)
+![Admin Dashboard](public/img/dashboard-admin3.png)
+![Admin Dashboard](public/img/dashboard-admin4.png)
+![Admin Dashboard](public/img/dashboard-admin5.png)
+![Admin Dashboard](public/img/dashboard-admin6.png)
+![Admin Dashboard](public/img/dashboard-admin7.png)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 2. Dashboard Kasir (Cashier)
+Streamlined interface for day-to-day transactions.
+- **Transaction Processing**: Create and detailed laundry orders.
+- **Invoicing**: Generate invoices for customers.
+- **Customer Management**: Add and manage customer details.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+![Cashier Dashboard](public/img/dashboard-kasir.png)
 
-## Deploy on Vercel
+### 3. Dashboard Owner
+Insights for business owners to track performance.
+- **Financial Reports**: View income and transaction summaries.
+- **Performance Metrics**: Analyze business growth.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+![Owner Dashboard](public/img/dashboard-owner.png)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🛠️ Getting Started
+
+Follow these steps to run the project locally:
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/rifai27077/laundry-app.git
+   cd laundry-app
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   # or
+   yarn install
+   # or
+   pnpm install
+   ```
+
+3. **Environment Setup**
+   Create a `.env` file in the root directory and configure your environment variables (Database URL, NextAuth secret, etc.).
+
+4. **Run Database Migrations**
+   ```bash
+   npm run db:push
+   # or relevant drizzle command
+   ```
+
+5. **Run the Development Server**
+   ```bash
+   npm run dev
+   ```
+
+   Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+## 📄 License
+
+This project is licensed under the MIT License.
