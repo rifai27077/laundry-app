@@ -101,3 +101,16 @@ CREATE INDEX idx_transaksi_outlet ON transaksi(id_outlet);
 CREATE INDEX idx_detail_transaksi_id ON detail_transaksi(id_transaksi);
 
 ALTER TYPE status_pesanan ADD VALUE 'dibatalkan';
+
+CREATE TYPE metode_pembayaran AS ENUM ('cash', 'transfer', 'qris');
+
+CREATE TABLE pembayaran (
+    id SERIAL PRIMARY KEY,
+    id_transaksi INT REFERENCES transaksi(id) ON DELETE CASCADE,
+    tgl_bayar TIMESTAMP DEFAULT NOW(),
+    jumlah_bayar INT NOT NULL,
+    metode_pembayaran metode_pembayaran,
+    keterangan TEXT
+);
+
+CREATE INDEX idx_pembayaran_transaksi ON pembayaran(id_transaksi);

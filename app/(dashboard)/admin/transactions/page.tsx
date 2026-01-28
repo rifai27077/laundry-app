@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Pagination from "@/app/components/Pagination";
 
 /* ============================
    TYPE DEFINISI
@@ -59,6 +60,11 @@ export default function TransaksiPage() {
   const [open, setOpen] = useState(false);
   const [editId, setEditId] = useState<number | null>(null);
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [limit] = useState(10);
+
   const emptyForm: Omit<Transaksi, "id"> = {
     id_outlet: 1,
     kode_invoice: "",
@@ -102,11 +108,15 @@ export default function TransaksiPage() {
   /* ============================
      FETCH / CRUD TRANSAKSI
   ===============================*/
-  const loadTransaksi = async () => {
+  const loadTransaksi = async (page = 1) => {
     try {
-      const res = await fetch("/api/transaksi");
+      const res = await fetch(`/api/transaksi?page=${page}&limit=${limit}`);
       if (!res.ok) throw new Error("Gagal fetch transaksi");
-      const data = await res.json();
+      const result = await res.json();
+      
+      const data = result.data || [];
+      const meta = result.meta || { page: 1, totalPages: 1 };
+
       // format tgl if necessary (take date part)
       const normalized = data.map((t: Transaksi) => ({
         ...t,
@@ -114,45 +124,49 @@ export default function TransaksiPage() {
         batas_waktu: formatDateOnly(t.batas_waktu),
       }));
       setTransaksi(normalized);
+      setCurrentPage(meta.page);
+      setTotalPages(meta.totalPages);
     } catch (err) {
       console.error("loadTransaksi:", err);
     }
   };
 
   useEffect(() => {
-    loadTransaksi();
+    loadTransaksi(currentPage);
     loadPakets();
-  }, []);
+  }, [currentPage]);
 
   /* ============================
      INVOICE GENERATOR
      - count transaksi pada hari ini (string compare on date part)
   ===============================*/
-  const generateInvoice = (list: Transaksi[]) => {
+  const generateInvoice = async () => {
     const now = new Date();
     const y = now.getFullYear();
     const m = String(now.getMonth() + 1).padStart(2, "0");
     const d = String(now.getDate()).padStart(2, "0");
 
-    const todayStr = now.toISOString().split("T")[0];
-
-    // hitung transaksi pada hari ini
-    const countToday =
-      list.filter((t) => (t.tgl || "").startsWith(todayStr)).length + 1;
-
-    const nomor = String(countToday).padStart(3, "0");
-    return `INV-${y}${m}${d}-${nomor}`;
+    try {
+      const res = await fetch("/api/transaksi?action=count_today");
+      const { count } = await res.json();
+      const nomor = String(count + 1).padStart(3, "0");
+      return `INV-${y}${m}${d}-${nomor}`;
+    } catch (err) {
+      console.error("generateInvoice error:", err);
+      return `INV-${y}${m}${d}-${Date.now().toString().slice(-3)}`;
+    }
   };
 
   /* ============================
      MODAL OPEN / EDIT
   ===============================*/
-  const openCreate = () => {
+  const openCreate = async () => {
     const todayStr = new Date().toISOString().split("T")[0];
+    const newInvoice = await generateInvoice();
     setEditId(null);
     setForm((prev) => ({
       ...prev,
-      kode_invoice: generateInvoice(transaksi),
+      kode_invoice: newInvoice,
       tgl: todayStr,
       batas_waktu: addDaysISO(todayStr, 3),
     }));
@@ -209,10 +223,10 @@ export default function TransaksiPage() {
 
   const loadPakets = async () => {
     try {
-      const res = await fetch("/api/paket");
+      const res = await fetch("/api/paket?page=1&limit=100");
       if (!res.ok) throw new Error("Gagal fetch paket");
-      const data = await res.json();
-      setPakets(data);
+      const result = await res.json();
+      setPakets(result.data || []);
     } catch (error) {
       console.error("loadPakets:", error);
     }
@@ -373,6 +387,13 @@ export default function TransaksiPage() {
             ))}
           </tbody>
         </table>
+
+        {/* PAGINATION */}
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={(page) => setCurrentPage(page)}
+        />
       </div>
 
       {/* MODAL */}

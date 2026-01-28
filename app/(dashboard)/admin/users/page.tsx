@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { UserPlus } from "lucide-react";
+import Pagination from "@/app/components/Pagination";
 
 type User = {
   id: number;
@@ -25,6 +26,11 @@ export default function UserPage() {
   const [editId, setEditId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [limit] = useState(10);
+
   const [form, setForm] = useState<Omit<User, "id">>({
     nama: "",
     username: "",
@@ -33,31 +39,24 @@ export default function UserPage() {
     role: "admin",
   });
 
-  const loadUsers = async () => {
-    const res = await fetch("/api/users");
-    
-    const data = await res.json();
-    setUsers(data);
+  const loadUsers = async (page = 1) => {
+    const res = await fetch(`/api/users?page=${page}&limit=${limit}`);
+    const result = await res.json();
+    setUsers(result.data || []);
+    setCurrentPage(result.meta?.page || 1);
+    setTotalPages(result.meta?.totalPages || 1);
   };
 
   const loadOutlets = async () => {
-    const res = await fetch("/api/outlet");
-    const data = await res.json();
-    setOutlets(data);
+    const res = await fetch("/api/outlet?page=1&limit=100");
+    const result = await res.json();
+    setOutlets(result.data || []);
   };
 
   useEffect(() => {
-    loadUsers();
+    loadUsers(currentPage);
     loadOutlets();
-  }, []);
-
-  // FIX useEffect async warning
-  useEffect(() => {
-    const fetchData = async () => {
-      await loadUsers();
-    };
-    fetchData();
-  }, []);
+  }, [currentPage]);
 
   const handleSubmit = async () => {
     setLoading(true); // mulai loading
@@ -176,6 +175,13 @@ export default function UserPage() {
             ))}
           </tbody>
         </table>
+
+        {/* PAGINATION */}
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={(page) => setCurrentPage(page)}
+        />
       </div>
 
       {/* MODAL */}

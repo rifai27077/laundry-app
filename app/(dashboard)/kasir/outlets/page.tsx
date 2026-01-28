@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import ModalAddOutlet from "@/app/components/ModalAddOutlet";
+import Pagination from "@/app/components/Pagination";
 
 type Outlet = {
     id: number;
@@ -15,6 +16,11 @@ export default function OutletPage() {
     const [open, setOpen] = useState(false);
     const [editId, setEditId] = useState<number | null>(null);
 
+    // Pagination state
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [limit] = useState(10);
+
     const [form, setForm] = useState<Omit<Outlet, "id">>({
         nama: "",
         alamat: "",
@@ -24,14 +30,17 @@ export default function OutletPage() {
     // ============================
     // LOAD ALL OUTLETS
     // ============================
-    const loadOutlets = async () => {
-        const res = await fetch("/api/outlet");
-        const data = await res.json();
+    const loadOutlets = async (page = 1) => {
+        const res = await fetch(`/api/outlet?page=${page}&limit=${limit}`);
+        const result = await res.json();
 
-        console.log("DATA API:", data, "isArray?", Array.isArray(data));
+        const data = result.data || [];
+        const meta = result.meta || { page: 1, totalPages: 1 };
 
         if (Array.isArray(data)) {
             setOutlets(data);
+            setCurrentPage(meta.page);
+            setTotalPages(meta.totalPages);
         } else {
             setOutlets([]);
         }
@@ -39,12 +48,8 @@ export default function OutletPage() {
 
 
     useEffect(() => {
-        const fetchData = async () => {
-            await loadOutlets();
-        };
-
-        fetchData();
-    }, []);
+        loadOutlets(currentPage);
+    }, [currentPage]);
 
     // ============================
     // SUBMIT FORM
@@ -176,6 +181,13 @@ export default function OutletPage() {
                 ))}
             </tbody>
             </table>
+
+            {/* PAGINATION */}
+            <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={(page) => setCurrentPage(page)}
+            />
         </div>
         </div>
     );

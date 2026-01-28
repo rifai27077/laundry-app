@@ -1,23 +1,42 @@
 import { NextResponse } from "next/server";
-import { sql } from "@/lib/db";
+import { prisma } from "@/lib/db";
 
-// GET — Ambil semua user
-export async function GET() {
+// GET — Ambil semua user (dengan pagination)
+export async function GET(req: Request) {
   try {
-    const users = await sql`
-      SELECT 
-        u.id,
-        u.nama,
-        u.username,
-        u.password,
-        u.role,
-        u.id_outlet,
-        o.alamat AS outlet_alamat
-      FROM users u
-      LEFT JOIN outlet o ON u.id_outlet = o.id
-      ORDER BY u.id DESC
-    `;
-    return NextResponse.json(users);
+    const { searchParams } = new URL(req.url);
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "10");
+    const skip = (page - 1) * limit;
+
+    const [users, total] = await Promise.all([
+      prisma.user.findMany({
+        orderBy: { id: "desc" },
+        skip,
+        take: limit,
+        include: {
+          outlet: {
+            select: { alamat: true }
+          }
+        }
+      }),
+      prisma.user.count(),
+    ]);
+
+    const data = users.map(u => ({
+      ...u,
+      outlet_alamat: u.outlet?.alamat
+    }));
+
+    return NextResponse.json({
+      data,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      }
+    });
   } catch (error) {
     console.log("GET Users Error:", error);
     return NextResponse.json({ error: "Gagal mengambil user" }, { status: 500 });
@@ -29,10 +48,15 @@ export async function POST(req: Request) {
   try {
     const { nama, username, password, id_outlet, role } = await req.json();
 
-    await sql`
-      INSERT INTO users (nama, username, password, id_outlet, role)
-      VALUES (${nama}, ${username}, ${password}, ${id_outlet}, ${role})
-    `;
+    await prisma.user.create({
+        data: {
+            nama,
+            username,
+            password,
+            id_outlet,
+            role
+        }
+    });
 
     return NextResponse.json({ message: "User ditambahkan" });
   } catch (error) {
@@ -46,12 +70,16 @@ export async function PUT(req: Request) {
   try {
     const { id, nama, username, password, id_outlet, role } = await req.json();
 
-    await sql`
-      UPDATE users
-      SET nama=${nama}, username=${username}, password=${password},
-          id_outlet=${id_outlet}, role=${role}
-      WHERE id=${id}
-    `;
+    await prisma.user.update({
+        where: { id: id },
+        data: {
+            nama,
+            username,
+            password,
+            id_outlet,
+            role
+        }
+    });
 
     return NextResponse.json({ message: "User diupdate" });
   } catch (error) {
@@ -65,7 +93,9 @@ export async function DELETE(req: Request) {
   try {
     const { id } = await req.json();
 
-    await sql`DELETE FROM users WHERE id=${id}`;
+    await prisma.user.delete({
+        where: { id: id }
+    });
 
     return NextResponse.json({ message: "User dihapus" });
   } catch (error) {

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import ModalRegisterMember from "@/app/components/ModalRegisterMember";
+import Pagination from "@/app/components/Pagination";
 
 interface Member {
   id: number;
@@ -22,10 +23,17 @@ export default function MemberPage() {
   const [open, setOpen] = useState(false);
   const [members, setMembers] = useState<Member[]>([]);
 
-  const loadMembers = async () => {
-    const res = await fetch("/api/member");
-      const data: Member[] = await res.json();
-      setMembers(data);
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [limit] = useState(10);
+
+  const loadMembers = async (page = 1) => {
+    const res = await fetch(`/api/member?page=${page}&limit=${limit}`);
+    const result = await res.json();
+    setMembers(result.data || []);
+    setCurrentPage(result.meta?.page || 1);
+    setTotalPages(result.meta?.totalPages || 1);
   };
 
   const handleSubmit = async (form: FormMember) => {
@@ -46,8 +54,8 @@ export default function MemberPage() {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    loadMembers();
-  }, []);
+    loadMembers(currentPage);
+  }, [currentPage]);
 
   return (
     <div className="space-y-10 p-4 md:p-6">
@@ -101,6 +109,13 @@ export default function MemberPage() {
             ))}
           </tbody>
         </table>
+
+        {/* PAGINATION */}
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={(page) => setCurrentPage(page)}
+        />
       </div>
 
     </div>

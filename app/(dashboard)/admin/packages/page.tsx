@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Pagination from "@/app/components/Pagination";
 
 type Paket = {
   id: number;
@@ -166,20 +167,24 @@ export default function PaketPage() {
   const [editId, setEditId] = useState<number | null>(null);
   const [pakets, setPakets] = useState<Paket[]>([]);
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [limit] = useState(10);
+
   const formatRupiah = new Intl.NumberFormat("id-ID").format;
 
-  const loadPaket = async () => {
-    const res = await fetch("/api/paket");
-    const data = await res.json();
-    setPakets(data);
+  const loadPaket = async (page = 1) => {
+    const res = await fetch(`/api/paket?page=${page}&limit=${limit}`);
+    const result = await res.json();
+    setPakets(result.data || []);
+    setCurrentPage(result.meta?.page || 1);
+    setTotalPages(result.meta?.totalPages || 1);
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      await loadPaket();
-    };
-    fetchData();
-  }, []);
+    loadPaket(currentPage);
+  }, [currentPage]);
 
 
   const [form, setForm] = useState<Omit<Paket, "id">>({
@@ -318,6 +323,13 @@ export default function PaketPage() {
             ))}
           </tbody>
         </table>
+
+        {/* PAGINATION */}
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={(page) => setCurrentPage(page)}
+        />
       </div>
     </div>
   );

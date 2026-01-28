@@ -1,17 +1,34 @@
 import { NextResponse } from "next/server";
-import { sql } from "@/lib/db";
+import { prisma } from "@/lib/db";
 
 // =======================
-// GET — ambil semua outlet
+// GET — ambil semua outlet (dengan pagination)
 // =======================
-export async function GET() {
+export async function GET(req: Request) {
     try {
-        const result = await sql`
-            SELECT id, nama, alamat, tlp
-            FROM outlet
-            ORDER BY id DESC
-        `;
-        return NextResponse.json(result);
+        const { searchParams } = new URL(req.url);
+        const page = parseInt(searchParams.get("page") || "1");
+        const limit = parseInt(searchParams.get("limit") || "10");
+        const skip = (page - 1) * limit;
+
+        const [data, total] = await Promise.all([
+            prisma.outlet.findMany({
+                orderBy: { id: "desc" },
+                skip,
+                take: limit,
+            }),
+            prisma.outlet.count(),
+        ]);
+
+        return NextResponse.json({
+            data,
+            meta: {
+                total,
+                page,
+                limit,
+                totalPages: Math.ceil(total / limit),
+            }
+        });
     } catch (error) {
         console.error("GET Outlet Error:", error);
         return NextResponse.json({ error: "Gagal mengambil data" }, { status: 500 });
@@ -25,10 +42,9 @@ export async function POST(req: Request) {
     try {
         const { nama, alamat, tlp } = await req.json();
 
-        await sql`
-            INSERT INTO outlet (nama, alamat, tlp)
-            VALUES (${nama}, ${alamat}, ${tlp})
-        `;
+        await prisma.outlet.create({
+            data: { nama, alamat, tlp }
+        });
 
         return NextResponse.json({ message: "Outlet berhasil ditambahkan" });
     } catch (error) {
@@ -44,11 +60,10 @@ export async function PUT(req: Request) {
     try {
         const { id, nama, alamat, tlp } = await req.json();
 
-        await sql`
-            UPDATE outlet
-            SET nama = ${nama}, alamat = ${alamat}, tlp = ${tlp}
-            WHERE id = ${id}
-        `;
+        await prisma.outlet.update({
+            where: { id: id },
+            data: { nama, alamat, tlp }
+        });
 
         return NextResponse.json({ message: "Outlet berhasil diupdate" });
     } catch (error) {
@@ -64,23 +79,18 @@ export async function DELETE(req: Request) {
     try {
         const { id } = await req.json();
 
-        await sql`
-            DELETE FROM outlet WHERE id = ${id}
-        `;
+        await prisma.outlet.delete({
+            where: { id: id }
+        });
 
         return NextResponse.json({ message: "Outlet berhasil dihapus" });
-    } catch (error: unknown) {
+    } catch (error: any) {
         console.error("DELETE Outlet Error:", error);
 
-        if (
-            typeof error === "object" &&
-            error !== null &&
-            "code" in error &&
-            (error as { code: string }).code === "23503"
-        ) {
+        if (error.code === 'P2003') { // Foreign key constraint
             return NextResponse.json(
                 {
-                    error: "Outlet tidak bisa dihapus karena masih memiliki paket.",
+                    error: "Outlet tidak bisa dihapus karena masih memiliki paket / relasi lain.",
                 },
                 { status: 400 }
             );

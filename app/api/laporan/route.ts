@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { sql } from "@/lib/db";
+import { prisma } from "@/lib/db";
+import { Prisma, StatusPesanan } from "@prisma/client";
 
 export async function GET(req: Request) {
   try {
@@ -10,62 +11,87 @@ export async function GET(req: Request) {
     const status = searchParams.get("status");
     const outlet = searchParams.get("outlet");
 
-    const conditions: string[] = [];
-    const values: (string | number)[] = [];
+    // Build Where Input
+    const where: Prisma.TransaksiWhereInput = {};
 
-    if (start) {
-        conditions.push(`t.tgl >= $${values.length + 1}`);
-        values.push(start);
-    }
-
-    if (end) {
-        conditions.push(`t.tgl <= $${values.length + 1}`);
-        values.push(end);
+    if (start || end) {
+        where.tgl = {};
+        if (start) where.tgl.gte = new Date(start);
+        if (end) where.tgl.lte = new Date(end);
     }
 
     if (status) {
-        conditions.push(`t.status = $${values.length + 1}`);
-        values.push(status);
+        where.status = status as StatusPesanan;
     }
 
     if (outlet) {
-        conditions.push(`t.id_outlet = $${values.length + 1}`);
-        values.push(outlet);
+        where.id_outlet = parseInt(outlet);
     }
 
-    const where = conditions.length
-        ? `WHERE ${conditions.join(" AND ")}`
-        : "";
-
     // TRANSAKSI
-    const transaksi = await sql.query(
-    `
-        SELECT 
-        t.*,
-        m.nama AS member_nama,
-        o.nama AS outlet_nama
-        FROM transaksi t
-        LEFT JOIN member m ON m.id = t.id_member
-        LEFT JOIN outlet o ON o.id = t.id_outlet
-        ${where}
-        ORDER BY t.tgl DESC
-    `,
-    values
-    );
+    // SELECT t.*, m.nama AS member_nama, o.nama AS outlet_nama
+    const transaksiRaw = await prisma.transaksi.findMany({
+        where: where,
+        include: {
+            member: { select: { nama: true } },
+            outlet: { select: { nama: true } }
+        },
+        orderBy: { tgl: 'desc' }
+    });
+
+    const transaksi = transaksiRaw.map(t => ({
+        ...t,
+        member_nama: t.member?.nama,
+        outlet_nama: t.outlet?.nama
+    }));
 
     // DETAIL
-    const detail = await sql`
-        SELECT 
-            d.*, 
-            p.nama_paket,
-            p.harga AS harga_perkilo
-        FROM detail_transaksi d
-        LEFT JOIN paket p ON p.id = d.id_paket
-    `;
+    // SELECT d.*, p.nama_paket, p.harga AS harga_perkilo
+    // Note: Detail query in original code did NOT filter by searchParams (?!)
+    // The original code:
+    // const detail = await sql`SELECT d.*, ... FROM detail_transaksi d LEFT JOIN paket ...`;
+    // It fetched ALL details in the database? That seems inefficient but I will replicate behavior
+    // OR improved it by filtering details by transactions found?
+    // Let's replicate original behavior for safety, or improve it.
+    // Given usage in frontend likely filters in memory or just dump all?
+    // Let's assume frontend matches `id` or something.
+    // Fetching ALL details is bad if database is large.
+    // But to be safe, I'll fetch `findMany` on detailTransaksi.
+    
+    // Actually, report usually shows details for filtered transactions.
+    // But original code didn't filter details query (no WHERE clause).
+    // I will stick to original logic: fetch all details (maybe limited by limit in frontend/backend?) 
+    // Wait, original `laporan/route.ts` fetches everything. This is dangerous for large data.
+    // I will replicate it for now.
+    
+    const detailRaw = await prisma.detailTransaksi.findMany({
+        include: {
+            paket: {
+                select: { nama_paket: true, harga: true }
+            }
+        }
+    });
 
-    const members = await sql`SELECT id, nama, alamat, tlp FROM member ORDER BY nama`;
-    const outlets = await sql`SELECT id, nama FROM outlet ORDER BY nama`;
-    const pakets = await sql`SELECT id, nama_paket, harga FROM paket ORDER BY nama_paket`;
+    const detail = detailRaw.map(d => ({
+        ...d,
+        nama_paket: d.paket?.nama_paket,
+        harga_perkilo: d.paket?.harga 
+    }));
+
+    const members = await prisma.member.findMany({
+        select: { id: true, nama: true, alamat: true, tlp: true },
+        orderBy: { nama: 'asc' }
+    });
+    
+    const outlets = await prisma.outlet.findMany({
+        select: { id: true, nama: true },
+        orderBy: { nama: 'asc' }
+    });
+
+    const pakets = await prisma.paket.findMany({
+        select: { id: true, nama_paket: true, harga: true },
+        orderBy: { nama_paket: 'asc' }
+    });
 
     return NextResponse.json({
         transaksi,

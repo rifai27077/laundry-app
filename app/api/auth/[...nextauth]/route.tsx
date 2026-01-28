@@ -1,6 +1,6 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { sql } from "@/lib/db";
+import { prisma } from "@/lib/db";
 
 const handler = NextAuth({
   providers: [
@@ -15,11 +15,9 @@ const handler = NextAuth({
         if (!credentials) return null;
 
         // Ambil user
-        const result = await sql`
-          SELECT * FROM users WHERE username = ${credentials.username} LIMIT 1
-        `;
-
-        const user = result[0]; // Neon return array
+        const user = await prisma.user.findUnique({
+            where: { username: credentials.username }
+        });
 
         if (!user) return null;
 
@@ -27,12 +25,12 @@ const handler = NextAuth({
         if (user.password !== credentials.password) return null;
 
         return {
-          id: user.id,
+          id: user.id.toString(), // NextAuth expects string ID usually, but we cast
           nama: user.nama,
           username: user.username,
           id_outlet: user.id_outlet,
-          role: user.role, // ENUM auto string
-        };
+          role: user.role, 
+        } as any;
       },
     }),
   ],
@@ -60,7 +58,7 @@ const handler = NextAuth({
         username: token.username,
         id_outlet: token.id_outlet,
         role: token.role,
-      };
+      } as any;
       return session;
     },
   },
