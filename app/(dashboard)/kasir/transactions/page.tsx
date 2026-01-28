@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import PaymentModal from "./PaymentModal";
+import PaymentModal from "../../../components/PaymentModal";
 import Pagination from "@/app/components/Pagination";
 
 /* ============================

@@ -33,7 +33,7 @@ export default function OutletPage() {
     const loadOutlets = async (page = 1) => {
         const res = await fetch(`/api/outlet?page=${page}&limit=${limit}`);
         const result = await res.json();
-        
+
         const data = result.data || [];
         const meta = result.meta || { page: 1, totalPages: 1 };
 

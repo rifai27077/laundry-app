@@ -47,6 +47,10 @@ type ChartItem = {
 
 type DashboardResponse = {
   customers: number;
+  totalTrans: number;
+  todayRevenue: number;
+  monthRevenue: number;
+  yearRevenue: number;
   stats: DashboardStats;
   daily: ChartItem[];
   monthly: ChartItem[];
@@ -119,12 +123,8 @@ const [data, setData] = useState<DashboardResponse | null>(null);
   const dailyData = data.daily;
   const monthlyData = data.monthly;
 
-  const dailyRevenue = data.dailyRevenue;
-  const monthlyRevenue = data.monthlyRevenue;
-  const yearlyRevenue = data.yearlyRevenue;
-
   return (
-    <RoleGuard allowedRoles={["owner"]}>
+    <RoleGuard allowedRoles={["kasir"]}>
       <div className="space-y-10 p-4 md:p-6">
 
         {/* HEADER */}
@@ -133,40 +133,38 @@ const [data, setData] = useState<DashboardResponse | null>(null);
             Selamat Datang,
             <span className="text-blue-600 dark:text-blue-400">
               {" "}
-              {session?.user?.nama ?? "Owner"}
+              {session?.user?.nama ?? "Kasir"}
             </span>
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-3">
-            Ringkasan aktivitas & pendapatan laundry.
+            Ringkasan aktivitas & pendapatan laundry hari ini.
           </p>
         </div>
 
-        {/* STATISTIK */}
+        {/* STATISTIK UTAMA */}
         <div>
           <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-gray-200">
-            Statistik Laundry
+            Statistik Utama
           </h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <StatCard title="Total Customer" value={data.customers} color="bg-blue-600" icon={<Users />} />
-            <StatCard title="Laundry Masuk" value={data.stats.masuk} color="bg-yellow-500" icon={<Truck />} />
-            <StatCard title="Sedang Diproses" value={data.stats.diproses} color="bg-orange-500" icon={<Clock4 />} />
-            <StatCard title="Laundry Selesai" value={data.stats.selesai} color="bg-green-600" icon={<CheckCircle2 />} />
-            <StatCard title="Sudah Diambil" value={data.stats.diambil} color="bg-purple-600" icon={<PackageCheck />} />
+            <StatCard title="Total Transaksi" value={data.totalTrans} color="bg-indigo-600" icon={<Truck />} />
+            <StatCard title="Order Selesai" value={data.stats.selesai} color="bg-green-600" icon={<CheckCircle2 />} />
             <StatCard title="Dibatalkan" value={data.stats.dibatalkan} color="bg-red-600" icon={<XCircle />} />
           </div>
         </div>
 
-        {/* GRAFIK PENDAPATAN */}
+        {/* RINGKASAN PENDAPATAN */}
         <div>
           <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-gray-200">
-            Grafik Pendapatan
+            Ringkasan Pendapatan
           </h2>
 
           <RevenueSummary
-            daily={dailyRevenue}
-            monthly={monthlyRevenue}
-            yearly={yearlyRevenue}
+            todayRevenue={data.todayRevenue}
+            monthRevenue={data.monthRevenue}
+            yearRevenue={data.yearRevenue}
           />
         </div>
 

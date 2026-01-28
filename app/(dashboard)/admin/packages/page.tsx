@@ -103,7 +103,7 @@ function ModalPaket({
             />
           </div>
 
-          {form.jenis === "kiloan" ? (
+          {form.jenis === "kiloan" && (
             <div>
               <label htmlFor="berat_kg" className="text-gray-300 text-sm">Berat (kg)</label>
               <input
@@ -112,32 +112,31 @@ function ModalPaket({
                 name="berat_kg"
                 value={form.berat_kg ?? 0}
                 onChange={(e) =>
-                  setForm({
-                    ...form,
-                    berat_kg: Number(e.target.value),
-                    harga: Number(e.target.value) * 7000, // Otomatis hitung harga
-                  })
-                }
-                required
-                className="w-full p-3 mt-1 rounded-xl bg-[#152036] text-white border border-gray-600"
-              />
-            </div>
-          ) : (
-            <div>
-              <label htmlFor="harga" className="text-gray-300 text-sm">Harga</label>
-              <input
-                id="harga"
-                type="number"
-                name="harga"
-                value={form.harga ?? 0}
-                onChange={(e) =>
-                  setForm({ ...form, harga: Number(e.target.value) })
+                    setForm({ ...form, berat_kg: Number(e.target.value) })
                 }
                 required
                 className="w-full p-3 mt-1 rounded-xl bg-[#152036] text-white border border-gray-600"
               />
             </div>
           )}
+
+          <div>
+            <label htmlFor="harga" className="text-gray-300 text-sm">
+                Harga {form.jenis === 'kiloan' ? '(Otomatis: Berat x 7000)' : '/ Satuan'}
+            </label>
+            <input
+              id="harga"
+              type="number"
+              name="harga"
+              value={form.jenis === 'kiloan' ? (Number(form.berat_kg) * 7000) : (form.harga ?? 0)}
+              readOnly={form.jenis === 'kiloan'}
+              onChange={(e) =>
+                setForm({ ...form, harga: Number(e.target.value) })
+              }
+              required
+              className={`w-full p-3 mt-1 rounded-xl bg-[#152036] text-white border border-gray-600 ${form.jenis === 'kiloan' ? 'opacity-60 cursor-not-allowed' : ''}`}
+            />
+          </div>
 
           <div className="flex gap-3">
             <button
@@ -200,8 +199,8 @@ export default function PaketPage() {
     const payload = {
       ...form,
       harga: form.jenis === "kiloan"
-        ? Number(form.berat_kg) * 7000
-        : form.harga,
+        ? (Number(form.berat_kg) || 0) * 7000
+        : Number(form.harga) || 0,
     };
 
     if (editId) {
