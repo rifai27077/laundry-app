@@ -22,26 +22,24 @@ export async function GET() {
         dibatalkan: statusCounts.find(s => s.status === 'dibatalkan')?._count.status || 0,
     };
 
-    // Daily: 7 days
-    // TO_CHAR(tgl, 'Dy') is Postgres specific. Prisma doesn't abstract this yet.
-    // Use queryRaw.
+    // Daily Transactions
     const daily = await prisma.$queryRaw`
       SELECT 
-        TO_CHAR(tgl, 'Dy') AS day,
-        COUNT(*)::int AS masuk
+        DATE_FORMAT(tgl, '%a') AS day,
+        COUNT(id) AS total
       FROM transaksi
-      WHERE tgl >= NOW() - INTERVAL '7 days'
+      WHERE tgl >= DATE_SUB(NOW(), INTERVAL 7 DAY)
       GROUP BY day
       ORDER BY MIN(tgl)
     `;
 
-    // Monthly: 6 months
+    // Monthly Transactions
     const monthly = await prisma.$queryRaw`
       SELECT 
-        TO_CHAR(tgl, 'Mon') AS month,
-        COUNT(*)::int AS masuk
+        DATE_FORMAT(tgl, '%b') AS month,
+        COUNT(id) AS total
       FROM transaksi
-      WHERE tgl >= NOW() - INTERVAL '6 months'
+      WHERE tgl >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
       GROUP BY month
       ORDER BY MIN(tgl)
     `;
@@ -49,10 +47,10 @@ export async function GET() {
     // Daily Revenue from Pembayaran
     const dailyRevenue = await prisma.$queryRaw`
       SELECT 
-        TO_CHAR(tgl_bayar, 'Dy') AS day,
-        SUM(jumlah_bayar)::int AS total
+        DATE_FORMAT(tgl_bayar, '%a') AS day,
+        SUM(jumlah_bayar) AS total
       FROM pembayaran
-      WHERE tgl_bayar >= NOW() - INTERVAL '7 days'
+      WHERE tgl_bayar >= DATE_SUB(NOW(), INTERVAL 7 DAY)
       GROUP BY day
       ORDER BY MIN(tgl_bayar)
     `;
@@ -60,10 +58,10 @@ export async function GET() {
     // Monthly Revenue from Pembayaran
     const monthlyRevenue = await prisma.$queryRaw`
       SELECT 
-        TO_CHAR(tgl_bayar, 'Mon') AS month,
-        SUM(jumlah_bayar)::int AS total
+        DATE_FORMAT(tgl_bayar, '%b') AS month,
+        SUM(jumlah_bayar) AS total
       FROM pembayaran
-      WHERE tgl_bayar >= NOW() - INTERVAL '6 months'
+      WHERE tgl_bayar >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
       GROUP BY month
       ORDER BY MIN(tgl_bayar)
     `;
@@ -71,8 +69,8 @@ export async function GET() {
     // Yearly Revenue from Pembayaran
     const yearlyRevenue = await prisma.$queryRaw`
       SELECT 
-        EXTRACT(YEAR FROM tgl_bayar)::text AS year,
-        SUM(jumlah_bayar)::int AS total
+        YEAR(tgl_bayar) AS year,
+        SUM(jumlah_bayar) AS total
       FROM pembayaran
       GROUP BY year
       ORDER BY year
@@ -103,6 +101,17 @@ export async function GET() {
         })
     ]);
 
+    // Helper to convert BigInt to Number for JSON serialization
+    const serializeRaw = (arr: any[]) => arr.map(item => {
+        const newItem = { ...item };
+        for (const key in newItem) {
+            if (typeof newItem[key] === 'bigint') {
+                newItem[key] = Number(newItem[key]);
+            }
+        }
+        return newItem;
+    });
+
     return NextResponse.json({
       customers: totalCustomer,
       totalTrans,
@@ -110,11 +119,11 @@ export async function GET() {
       monthRevenue: monthRevenue._sum.jumlah_bayar || 0,
       yearRevenue: yearRevenue._sum.jumlah_bayar || 0,
       stats,
-      daily,
-      monthly,
-      dailyRevenue,
-      monthlyRevenue,
-      yearlyRevenue,
+      daily: serializeRaw(daily as any[]),
+      monthly: serializeRaw(monthly as any[]),
+      dailyRevenue: serializeRaw(dailyRevenue as any[]),
+      monthlyRevenue: serializeRaw(monthlyRevenue as any[]),
+      yearlyRevenue: serializeRaw(yearlyRevenue as any[]),
     });
 
   } catch (err) {

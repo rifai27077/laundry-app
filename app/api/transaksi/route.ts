@@ -133,9 +133,9 @@ export async function POST(req: Request) {
     const grand_total = Number(body.grand_total) && Number(body.grand_total) > 0 ? Number(body.grand_total) : Math.max(Math.floor(afterDiskon + pajak + biaya_tambahan), 0);
 
     const createData: any = {
-      id_outlet: body.id_outlet,
+      id_outlet: Number(body.id_outlet),
       kode_invoice: body.kode_invoice,
-      id_member: id_member,
+      id_member: id_member ? Number(id_member) : null,
       tgl: new Date(body.tgl), // Ensure Date type
       batas_waktu: body.batas_waktu ? new Date(body.batas_waktu) : null,
       tgl_bayar: body.tgl_bayar ? new Date(body.tgl_bayar) : null,
@@ -144,7 +144,7 @@ export async function POST(req: Request) {
       pajak: pajak,
       status: body.status,
       dibayar: body.dibayar,
-      id_user: body.id_user || null,
+      id_user: body.id_user ? Number(body.id_user) : null,
       grand_total: grand_total,
       detailTransaksis: { create: detailData }
     };
@@ -275,11 +275,11 @@ export async function PUT(req: Request) {
         }
 
         const updated = await prisma.transaksi.update({
-            where: { id: body.id },
+            where: { id: Number(body.id) },
             data: {
-                id_outlet: body.id_outlet,
+                id_outlet: Number(body.id_outlet),
                 kode_invoice: body.kode_invoice,
-                id_member: body.id_member,
+                id_member: body.id_member ? Number(body.id_member) : null,
                 tgl: body.tgl ? new Date(body.tgl) : undefined,
                 batas_waktu: body.batas_waktu ? new Date(body.batas_waktu) : undefined,
                 tgl_bayar: body.tgl_bayar ? new Date(body.tgl_bayar) : undefined,
@@ -288,7 +288,7 @@ export async function PUT(req: Request) {
                 pajak: body.pajak,
                 status: body.status,
                 dibayar: body.dibayar,
-                id_user: body.id_user,
+                id_user: body.id_user ? Number(body.id_user) : null,
                 grand_total: body.grand_total,
             }
         });
@@ -326,7 +326,7 @@ export async function DELETE(req: Request) {
     // So we just need to delete the transaction.
     
     await prisma.transaksi.delete({
-        where: { id: id }
+        where: { id: Number(id) }
     });
 
     return NextResponse.json({ success: true });

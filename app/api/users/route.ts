@@ -53,7 +53,7 @@ export async function POST(req: Request) {
             nama,
             username,
             password,
-            id_outlet,
+            id_outlet: Number(id_outlet),
             role
         }
     });
@@ -71,12 +71,12 @@ export async function PUT(req: Request) {
     const { id, nama, username, password, id_outlet, role } = await req.json();
 
     await prisma.user.update({
-        where: { id: id },
+        where: { id: Number(id) },
         data: {
             nama,
             username,
             password,
-            id_outlet,
+            id_outlet: Number(id_outlet),
             role
         }
     });
@@ -94,7 +94,7 @@ export async function DELETE(req: Request) {
     const { id } = await req.json();
 
     await prisma.user.delete({
-        where: { id: id }
+        where: { id: Number(id) }
     });
 
     return NextResponse.json({ message: "User dihapus" });

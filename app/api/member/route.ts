@@ -55,3 +55,47 @@ export async function POST(req: Request) {
     );
   }
 }
+
+export async function PUT(req: Request) {
+    try {
+        const { id, nama, tlp, jenis_kelamin, alamat } = await req.json();
+        
+        await prisma.member.update({
+            where: { id: Number(id) },
+            data: {
+                nama,
+                tlp,
+                jenis_kelamin: jenis_kelamin as JenisKelamin,
+                alamat
+            }
+        });
+
+        return NextResponse.json({ message: "Data pelanggan berhasil diupdate" });
+    } catch (error) {
+        console.error("PUT member error:", error);
+        return NextResponse.json({ error: "Gagal mengupdate pelanggan" }, { status: 500 });
+    }
+}
+
+export async function DELETE(req: Request) {
+    try {
+        const { id } = await req.json();
+
+        await prisma.member.delete({
+            where: { id: Number(id) }
+        });
+
+        return NextResponse.json({ message: "Pelanggan berhasil dihapus" });
+    } catch (error: any) {
+        console.error("DELETE member error:", error);
+        
+        if (error.code === 'P2003') {
+            return NextResponse.json(
+                { error: "Member tidak bisa dihapus karena masih memiliki riwayat transaksi." },
+                { status: 400 }
+            );
+        }
+
+        return NextResponse.json({ error: "Gagal menghapus pelanggan" }, { status: 500 });
+    }
+}

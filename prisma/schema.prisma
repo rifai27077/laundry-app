@@ -4,14 +4,14 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
 model Outlet {
   id     Int     @id @default(autoincrement())
   nama   String  @db.VarChar(100)
-  alamat String
+  alamat String  @db.Text
   tlp    String? @db.VarChar(15)
 
   users      User[]
@@ -38,7 +38,7 @@ model User {
 model Member {
   id            Int           @id @default(autoincrement())
   nama          String        @db.VarChar(100)
-  alamat        String?
+  alamat        String?       @db.Text
   jenis_kelamin JenisKelamin?
   tlp           String?       @db.VarChar(15)
   poin          Int           @default(0)
@@ -69,9 +69,9 @@ model Transaksi {
   id_outlet      Int?
   kode_invoice   String        @db.VarChar(100)
   id_member      Int?
-  tgl            DateTime      @default(now()) @db.Timestamp(6)
-  batas_waktu    DateTime?     @db.Timestamp(6)
-  tgl_bayar      DateTime?     @db.Timestamp(6)
+  tgl            DateTime      @default(now()) @db.DateTime(6)
+  batas_waktu    DateTime?     @db.DateTime(6)
+  tgl_bayar      DateTime?     @db.DateTime(6)
   biaya_tambahan Int?          @default(0)
   diskon         Int?          @default(0)
   pajak          Int?          @default(0)
@@ -99,8 +99,8 @@ model DetailTransaksi {
   id           Int     @id @default(autoincrement())
   id_transaksi Int?    
   id_paket     Int?
-  qty          Float
-  keterangan   String?
+  qty          Float   @db.Double
+  keterangan   String? @db.Text
   harga        Int?
 
   transaksi Transaksi? @relation(fields: [id_transaksi], references: [id], onDelete: Cascade)
@@ -115,10 +115,10 @@ model DetailTransaksi {
 model Pembayaran {
   id                Int               @id @default(autoincrement())
   id_transaksi      Int?
-  tgl_bayar         DateTime?         @default(now()) @db.Timestamp(6)
+  tgl_bayar         DateTime?         @default(now()) @db.DateTime(6)
   jumlah_bayar      Int
   metode_pembayaran MetodePembayaran?
-  keterangan        String?
+  keterangan        String?           @db.Text
 
   transaksi Transaksi? @relation(fields: [id_transaksi], references: [id], onDelete: Cascade)
 

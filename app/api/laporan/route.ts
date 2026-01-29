@@ -25,7 +25,7 @@ export async function GET(req: Request) {
     }
 
     if (outlet) {
-        where.id_outlet = parseInt(outlet);
+        where.id_outlet = Number(outlet);
     }
 
     // TRANSAKSI

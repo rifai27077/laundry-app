@@ -6,6 +6,7 @@ import QRCode from "qrcode";
 // Prevent caching
 export const dynamic = 'force-dynamic';
 
+// GET — Dashboard WhatsApp Status & QR (MySQL Ready)
 export async function GET() {
     const rawQr = getQrCode();
     const status = getStatus();

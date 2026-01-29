@@ -124,7 +124,7 @@ const [data, setData] = useState<DashboardResponse | null>(null);
   const monthlyData = data.monthly;
 
   return (
-    <RoleGuard allowedRoles={["kasir"]}>
+    <RoleGuard allowedRoles={["admin"]}>
       <div className="space-y-10 p-4 md:p-6">
 
         {/* HEADER */}
@@ -133,7 +133,7 @@ const [data, setData] = useState<DashboardResponse | null>(null);
             Selamat Datang,
             <span className="text-blue-600 dark:text-blue-400">
               {" "}
-              {session?.user?.nama ?? "Kasir"}
+              {session?.user?.nama ?? "Admin"}
             </span>
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-3">

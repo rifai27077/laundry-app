@@ -44,7 +44,7 @@ export async function GET(req: Request) {
             }
         });
     } catch (error) {
-        console.error("DEBUG_NEON_ERR: GET Paket Error:", error);
+        console.error("GET Paket Error:", error);
         return NextResponse.json(
         { error: "Gagal mengambil data paket" },
         { status: 500 }
@@ -60,10 +60,10 @@ export async function POST(req: Request) {
 
         await prisma.paket.create({
             data: {
-                id_outlet: id_outlet,
+                id_outlet: Number(id_outlet),
                 jenis: jenis as JenisPaket,
                 nama_paket: nama_paket,
-                harga: harga
+                harga: Number(harga)
             }
         });
 
@@ -84,12 +84,12 @@ export async function PUT(req: Request) {
         const { id, id_outlet, jenis, nama_paket, harga } = body;
 
         await prisma.paket.update({
-            where: { id: id },
+            where: { id: Number(id) },
             data: {
-                id_outlet: id_outlet,
+                id_outlet: Number(id_outlet),
                 jenis: jenis as JenisPaket,
                 nama_paket: nama_paket,
-                harga: harga
+                harga: Number(harga)
             }
         });
 
@@ -109,7 +109,7 @@ export async function DELETE(req: Request) {
         const { id } = await req.json();
 
         await prisma.paket.delete({
-            where: { id: id }
+            where: { id: Number(id) }
         });
 
         return NextResponse.json({ message: "Paket berhasil dihapus" });

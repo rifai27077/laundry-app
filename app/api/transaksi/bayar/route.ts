@@ -17,8 +17,8 @@ export async function POST(req: Request) {
     // 1. Simpan data pembayaran
     await prisma.pembayaran.create({
       data: {
-        id_transaksi: id_transaksi,
-        jumlah_bayar: jumlah_bayar,
+        id_transaksi: Number(id_transaksi),
+        jumlah_bayar: Number(jumlah_bayar),
         metode_pembayaran: metode_pembayaran as MetodePembayaran, // Ensure enum match
         keterangan: keterangan
       }
@@ -30,14 +30,14 @@ export async function POST(req: Request) {
         jumlah_bayar: true
       },
       where: {
-        id_transaksi: id_transaksi
+        id_transaksi: Number(id_transaksi)
       }
     });
     const totalBayar = agg._sum.jumlah_bayar || 0;
 
     // 3. Ambil grand_total transaksi dan id_member
     const trx = await prisma.transaksi.findUnique({
-      where: { id: id_transaksi },
+      where: { id: Number(id_transaksi) },
       select: { grand_total: true, id_member: true }
     });
     
@@ -54,7 +54,7 @@ export async function POST(req: Request) {
     }
 
     await prisma.transaksi.update({
-      where: { id: id_transaksi },
+      where: { id: Number(id_transaksi) },
       data: { dibayar: statusBayar }
     });
 

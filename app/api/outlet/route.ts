@@ -61,7 +61,7 @@ export async function PUT(req: Request) {
         const { id, nama, alamat, tlp } = await req.json();
 
         await prisma.outlet.update({
-            where: { id: id },
+            where: { id: Number(id) },
             data: { nama, alamat, tlp }
         });
 
@@ -80,7 +80,7 @@ export async function DELETE(req: Request) {
         const { id } = await req.json();
 
         await prisma.outlet.delete({
-            where: { id: id }
+            where: { id: Number(id) }
         });
 
         return NextResponse.json({ message: "Outlet berhasil dihapus" });

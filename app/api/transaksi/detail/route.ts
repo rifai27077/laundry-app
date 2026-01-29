@@ -7,7 +7,7 @@ export async function POST(req: Request) {
     const { id_transaksi } = await req.json();
 
     const result = await prisma.detailTransaksi.findMany({
-        where: { id_transaksi: id_transaksi },
+        where: { id_transaksi: Number(id_transaksi) },
         include: { paket: true } 
     });
 
@@ -36,9 +36,9 @@ export async function PUT(req: Request) {
 
     await prisma.detailTransaksi.create({
         data: {
-            id_transaksi: id_transaksi,
-            id_paket: id_paket,
-            qty: qty,
+            id_transaksi: Number(id_transaksi),
+            id_paket: Number(id_paket),
+            qty: Number(qty) || 1,
             keterangan: keterangan
         }
     });

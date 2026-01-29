@@ -1,99 +1,108 @@
-# Laundry App
+# 🧺 Laundry App - AI-Powered Management System
 
-A comprehensive web-based laundry management system designed to streamline operations for laundry businesses. This application provides dedicated dashboards for Administrators, Cashiers, and Owners to manage transactions, customers, and business performance efficiently.
+A comprehensive web-based laundry management system designed to streamline business operations. This application features dedicated dashboards for Administrators, Cashiers, and Owners, integrated with **WhatsApp Session Management** and an **AI-powered Chatbot** for automated customer interaction.
 
-🔗 **[Live Demo](https://laundry-app-gold.vercel.app)**
+<!-- 🔗 **[Live Demo](https://laundry-app-gold.vercel.app)**
 
-Login as Admin
-- **Username:** admin
-- **Password:** admin123
+---
 
-Login as Cashier
-- **Username:** kasir
-- **Password:** kasir123
+### 🔑 Credentials (Demo)
 
-Login as Owner
-- **Username:** owner
-- **Password:** owner123
+| Role | Username | Password |
+| :--- | :--- | :--- |
+| **Admin** | `admin` | `admin123` |
+| **Cashier** | `kasir` | `kasir123` |
+| **Owner** | `owner` | `owner123` | -->
 
-## 🚀 Tech Stack
+---
 
-Built with modern web technologies for performance and scalability:
+## 🚀 Modern Tech Stack
 
-- **Framework:** [Next.js 16](https://nextjs.org/)
-- **Language:** [TypeScript](https://www.typescriptlang.org/)
-- **Styling:** [Tailwind CSS](https://tailwindcss.com/)
-- **Database:** [Neon (PostgreSQL)](https://neon.tech/)
-- **ORM:** [Drizzle ORM](https://orm.drizzle.team/)
-- **Authentication:** [NextAuth.js](https://next-auth.js.org/)
-- **Icons:** [Lucide React](https://lucide.dev/)
+Built with cutting-edge technologies for reliability and speed:
 
-## ✨ key Features
+-   **Framework:** [Next.js 16 (App Router)](https://nextjs.org/)
+-   **Language:** [TypeScript](https://www.typescriptlang.org/)
+-   **Styling:** [Tailwind CSS 4](https://tailwindcss.com/)
+-   **Database:** PostgreSQL/MySQL via [Neon](https://neon.tech/)
+-   **ORM:** [Prisma](https://www.prisma.io/) & [Drizzle](https://orm.drizzle.team/)
+-   **WhatsApp Engine:** [@whiskeysockets/baileys](https://github.com/WhiskeySockets/Baileys)
+-   **AI Integration:** [OpenAI](https://openai.com/) / [Groq (Llama 3.3)](https://groq.com/)
+-   **Authentication:** [NextAuth.js](https://next-auth.js.org/)
 
-### 1. Dashboard Administrator
-Manage the core aspects of the laundry business including master data and user roles.
-- **User Management**: Manage admins, cashiers, and owners.
-- **Master Data**: Manage products/services and categories.
-- **Reporting**: View overall business stats.
+---
 
-![Admin Dashboard](public/img/dashboard-admin1.png)
-![Admin Dashboard](public/img/dashboard-admin2.png)
-![Admin Dashboard](public/img/dashboard-admin3.png)
-![Admin Dashboard](public/img/dashboard-admin4.png)
-![Admin Dashboard](public/img/dashboard-admin5.png)
-![Admin Dashboard](public/img/dashboard-admin6.png)
-![Admin Dashboard](public/img/dashboard-admin7.png)
+## ✨ Key Features
 
-### 2. Dashboard Kasir (Cashier)
-Streamlined interface for day-to-day transactions.
-- **Transaction Processing**: Create and detailed laundry orders.
-- **Invoicing**: Generate invoices for customers.
-- **Customer Management**: Add and manage customer details.
+### 1. 🤖 AI & WhatsApp Integration
+The stand-out feature of this app is its automated communication layer.
+-   **WhatsApp Session Manager**: Linked via QR Code directly from the admin dashboard.
+-   **AI Chatbot**: Automatically responds to customer inquiries about order status, balance/saldo, and loyalty points using real-time database context.
+-   **Smart Notifications**: Generates friendly, human-like WhatsApp messages when order statuses change (New → Process → Ready → Collected).
 
-![Cashier Dashboard](public/img/dashboard-kasir.png)
+### 2. 🛡️ Multi-Role Dashboards
+-   **Administrator**: Full control over users (Admins, Cashiers, Owners), outlet management, package configurations, and system-wide settings.
+-   **Kasir (Cashier)**: Efficient transaction workflow, customer registration, invoice generation, and status updates.
+-   **Owner**: high-level business intelligence, financial summaries, and performance growth metrics.
 
-### 3. Dashboard Owner
-Insights for business owners to track performance.
-- **Financial Reports**: View income and transaction summaries.
-- **Performance Metrics**: Analyze business growth.
+### 3. 💳 Customer Loyalty & Membership
+-   **Loyalty Points**: Customers earn points from transactions.
+-   **Balance System (Saldo)**: Manage customer deposits for easier future payments.
+-   **Transaction History**: Complete logs of all laundry activities.
 
-![Owner Dashboard](public/img/dashboard-owner.png)
+<!-- ---
 
-## 🛠️ Getting Started
+## 📸 Screenshots
 
-Follow these steps to run the project locally:
+| Feature | Preview |
+| :--- | :--- |
+| **Admin Dashboard** | ![Admin](public/img/dashboard-admin1.png) |
+| **WhatsApp QR API** | ![WA QR](public/img/dashboard-admin7.png) |
+| **Cashier Flow** | ![Cashier](public/img/dashboard-kasir.png) |
+| **Owner Reports** | ![Owner](public/img/dashboard-owner.png) | -->
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/rifai27077/laundry-app.git
-   cd laundry-app
-   ```
+---
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   # or
-   yarn install
-   # or
-   pnpm install
-   ```
+## 🛠️ Local Development
 
-3. **Environment Setup**
-   Create a `.env` file in the root directory and configure your environment variables (Database URL, NextAuth secret, etc.).
+### Prerequisites
+-   Node.js 20+
+-   PostgreSQL or MySQL Database
 
-4. **Run Database Migrations**
-   ```bash
-   npm run db:push
-   # or relevant drizzle command
-   ```
+### Installation
 
-5. **Run the Development Server**
-   ```bash
-   npm run dev
-   ```
+1.  **Clone the repository**
+    ```bash
+    git clone https://github.com/rifai27077/laundry-app.git
+    cd laundry-app
+    ```
 
-   Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2.  **Install dependencies**
+    ```bash
+    npm install
+    ```
+
+3.  **Environment Setup**
+    Create a `.env` file based on the project requirements:
+    ```env
+    DATABASE_URL="your_database_url"
+    NEXTAUTH_SECRET="your_secret"
+    AI_API_KEY="your_openai_or_groq_key"
+    ```
+
+4.  **Database Sync**
+    ```bash
+    npx prisma generate
+    npx prisma db push
+    ```
+
+5.  **Run Development Server**
+    ```bash
+    npm run dev
+    ```
+
+Visit `http://localhost:3000` to access the application.
+
+---
 
 ## 📄 License
-
 This project is licensed under the MIT License.

@@ -28,7 +28,7 @@ const handler = NextAuth({
           id: user.id.toString(), // NextAuth expects string ID usually, but we cast
           nama: user.nama,
           username: user.username,
-          id_outlet: user.id_outlet,
+          id_outlet: Number(user.id_outlet),
           role: user.role, 
         } as any;
       },
